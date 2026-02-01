@@ -56,6 +56,6 @@ async def metrics(request: Request):
         }
 
     return JSONResponse(
-    content=result,
+    content={"regions": result},
     headers=CORS_HEADERS
 )
