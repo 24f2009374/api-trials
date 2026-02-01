@@ -7,13 +7,12 @@ from pathlib import Path
 app = FastAPI()
 
 # ---- CORS (manual, Vercel-safe) ----
-@app.middleware("http")
-async def cors_middleware(request: Request, call_next):
-    response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "*"
-    return response
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Expose-Headers": "Access-Control-Allow-Origin",
+}
 
 # ---- Load telemetry once ----
 TELEMETRY_PATH = Path(__file__).parent.parent / "telemetry.json"
@@ -24,7 +23,11 @@ with open(TELEMETRY_PATH, "r") as f:
 @app.options("/api")
 @app.options("/api/index")
 async def preflight():
-    return JSONResponse(status_code=200, content={})
+    return JSONResponse(
+        status_code=200,
+        content={},
+        headers=CORS_HEADERS
+    )
 
 @app.post("/api")
 @app.post("/api/index")
@@ -52,4 +55,7 @@ async def metrics(request: Request):
             "breaches": int((latencies > threshold).sum())
         }
 
-    return JSONResponse(content=result)
+    return JSONResponse(
+    content=result,
+    headers=CORS_HEADERS
+)
