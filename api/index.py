@@ -21,11 +21,11 @@ TELEMETRY_PATH = Path(__file__).parent.parent / "telemetry.json"
 with open(TELEMETRY_PATH, "r") as f:
     telemetry = json.load(f)
 
-@app.options("/api/metrics")
+@app.options("/")
 async def preflight():
     return JSONResponse(status_code=200, content={})
 
-@app.post("/api/metrics")
+@app.post("/")
 async def metrics(request: Request):
     body = await request.json()
 
